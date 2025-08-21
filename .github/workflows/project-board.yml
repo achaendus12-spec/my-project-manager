@@ -1,0 +1,17 @@
+name: Project Board Automation
+
+on:
+  issues:
+    types: [opened, edited, reopened, closed]
+  pull_request:
+    types: [opened, edited, reopened, closed, reopened]
+
+jobs:
+  update-project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Move issue/PR to project board
+        uses: actions/add-to-project@v0.4.0
+        with:
+          project-url: https://github.com/users/achaendus12-spec/projects/1
+          github-token: ${{ secrets.GITHUB_TOKEN }}
