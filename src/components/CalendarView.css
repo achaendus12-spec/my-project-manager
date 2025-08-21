@@ -1,0 +1,51 @@
+/* CalendarView.css */
+
+/* Wrapper untuk dark mode */
+.calendar-wrapper.dark {
+  background-color: #1f2937; /* bg-gray-800 */
+  color: white;
+}
+
+/* Header kalender */
+.calendar-wrapper.dark .rbc-toolbar {
+  background-color: #111827; /* bg-gray-900 */
+  border-bottom: 1px solid #374151; /* border-gray-700 */
+}
+
+.calendar-wrapper.dark .rbc-toolbar button {
+  background-color: #374151; /* bg-gray-700 */
+  color: white;
+  border: none;
+}
+
+.calendar-wrapper.dark .rbc-toolbar button:hover {
+  background-color: #4b5563; /* bg-gray-600 */
+}
+
+/* Grid tanggal */
+.calendar-wrapper.dark .rbc-month-view,
+.calendar-wrapper.dark .rbc-time-view {
+  background-color: #1f2937; /* bg-gray-800 */
+}
+
+/* Hari di bulan */
+.calendar-wrapper.dark .rbc-date-cell {
+  color: white;
+}
+
+/* Event */
+.calendar-wrapper.dark .rbc-event {
+  background-color: #2563eb; /* biru */
+  color: white;
+}
+
+/* Hari hari ini */
+.calendar-wrapper.dark .rbc-today {
+  background-color: rgba(37, 99, 235, 0.2); /* biru transparan */
+}
+
+/* Border antar sel */
+.calendar-wrapper.dark .rbc-month-row,
+.calendar-wrapper.dark .rbc-time-content {
+  border-color: #374151; /* border-gray-700 */
+}

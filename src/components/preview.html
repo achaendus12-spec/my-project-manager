@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manajemen Proyek (Supabase)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js"></script>
+</head>
+<body class="bg-gray-100">
+
+  <div class="p-6">
+    <h1 class="text-2xl font-bold mb-4">📋 Manajemen Proyek</h1>
+    <button id="addBtn" class="bg-blue-500 text-white px-4 py-2 rounded">+ Tambah Proyek</button>
+    <div class="mt-6 overflow-x-auto">
+      <table class="min-w-full bg-white rounded shadow">
+        <thead>
+          <tr class="bg-gray-100 text-left text-gray-600 uppercase text-sm">
+            <th class="px-4 py-2">Nama</th>
+            <th class="px-4 py-2">Kategori</th>
+            <th class="px-4 py-2">Deskripsi</th>
+            <th class="px-4 py-2">Deadline</th>
+            <th class="px-4 py-2">Prioritas</th>
+            <th class="px-4 py-2">Progress</th>
+            <th class="px-4 py-2">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="projectList"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="projectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center">
+    <div class="bg-white rounded p-6 w-96 shadow-lg">
+      <h2 id="modalTitle" class="text-lg font-bold mb-4">Tambah Proyek</h2>
+      <form id="projectForm" class="space-y-3">
+        <input id="name" type="text" placeholder="Nama Proyek" class="border p-2 w-full" required>
+        <input id="category" type="text" placeholder="Kategori" class="border p-2 w-full" required>
+        <textarea id="description" placeholder="Deskripsi" class="border p-2 w-full" required></textarea>
+        <input id="deadline" type="date" class="border p-2 w-full" required>
+        <select id="priority" class="border p-2 w-full" required>
+          <option value="">Pilih Prioritas</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+        <input id="progress" type="number" placeholder="Progress (%)" class="border p-2 w-full" min="0" max="100" value="0" required>
+        <div class="flex justify-end gap-2">
+          <button type="button" id="cancelBtn" class="bg-gray-300 px-3 py-1 rounded">Batal</button>
+          <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Ganti dengan project Supabase kamu
+    const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
+    const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const modal = document.getElementById('projectModal');
+    const addBtn = document.getElementById('addBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const projectForm = document.getElementById('projectForm');
+    const projectList = document.getElementById('projectList');
+    const modalTitle = document.getElementById('modalTitle');
+
+    let editId = null;
+
+    async function renderProjects() {
+      projectList.innerHTML = "";
+      const { data: projects, error } = await supabase
+        .from("projects")
+        .select("*")
+        .order("deadline", { ascending: true });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      projectList.innerHTML = projects.map(p => `
+        <tr class="border-b">
+          <td class="px-4 py-2 font-medium">${p.name}</td>
+          <td class="px-4 py-2">${p.category}</td>
+          <td class="px-4 py-2">${p.description}</td>
+          <td class="px-4 py-2">${p.deadline}</td>
+          <td class="px-4 py-2">
+            <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+              p.priority === "High" ? "bg-red-100 text-red-700" :
+              p.priority === "Medium" ? "bg-yellow-100 text-yellow-700" :
+              "bg-green-100 text-green-700"
+            }">${p.priority}</span>
+          </td>
+          <td class="px-4 py-2">
+            <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden relative">
+              <div class="h-4 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                   style="width: ${p.progress}%; background: ${
+                     p.progress < 30 ? "#dc2626" :
+                     p.progress < 70 ? "#ca8a04" :
+                     "#16a34a"
+                   };">
+                ${p.progress}%
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-2 flex gap-2">
+            <button onclick="editProject('${p.id}')" class="bg-blue-100 text-blue-600 px-2 py-1 rounded">✏️</button>
+            <button onclick="deleteProject('${p.id}')" class="bg-red-100 text-red-600 px-2 py-1 rounded">🗑️</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function openModal() {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeModal() {
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+      projectForm.reset();
+      editId = null;
+    }
+
+    addBtn.addEventListener('click', () => {
+      modalTitle.textContent = "Tambah Proyek";
+      openModal();
+    });
+
+    cancelBtn.addEventListener('click', closeModal);
+
+    projectForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newProject = {
+        name: document.getElementById('name').value,
+        category: document.getElementById('category').value,
+        description: document.getElementById('description').value,
+        deadline: document.getElementById('deadline').value,
+        priority: document.getElementById('priority').value,
+        progress: parseInt(document.getElementById('progress').value),
+        user_id: (await supabase.auth.getUser()).data.user.id
+      };
+
+      if (editId) {
+        await supabase.from("projects").update(newProject).eq("id", editId);
+      } else {
+        await supabase.from("projects").insert([newProject]);
+      }
+
+      renderProjects();
+      closeModal();
+    });
+
+    async function editProject(id) {
+      const { data, error } = await supabase.from("projects").select("*").eq("id", id).single();
+      if (error) return console.error(error);
+      document.getElementById('name').value = data.name;
+      document.getElementById('category').value = data.category;
+      document.getElementById('description').value = data.description;
+      document.getElementById('deadline').value = data.deadline;
+      document.getElementById('priority').value = data.priority;
+      document.getElementById('progress').value = data.progress;
+      modalTitle.textContent = "Edit Proyek";
+      editId = id;
+      openModal();
+    }
+
+    async function deleteProject(id) {
+      if (confirm("Hapus proyek ini?")) {
+        await supabase.from("projects").delete().eq("id", id);
+        renderProjects();
+      }
+    }
+
+    // biar tombol bisa dipanggil inline
+    window.editProject = editProject;
+    window.deleteProject = deleteProject;
+
+    renderProjects();
+  </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment (jangan upload API key rahasia)
+.env
+.env.*
+!.env.example
+
+# Supabase key folder
+anon key supabase/
+
+# Documentation (kalau tidak mau diupload)
+Dokumentasi_Proyek/
+
+# Ignore PDF
+*.PDF
+*.pdf
