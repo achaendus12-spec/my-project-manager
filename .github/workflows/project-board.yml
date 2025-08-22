@@ -32,7 +32,7 @@ jobs:
         uses: actions/add-to-project@v0.6.1
         with:
           project-url: https://github.com/users/achaendus12-spec/projects/1
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT }}
           column-name: In Progress
 
       - name: Move PR to Done when merged
