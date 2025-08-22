@@ -2,14 +2,42 @@ name: Project Board Automation
 
 on:
   issues:
-    types: [opened]
+    types: [opened, closed]
+  pull_request:
+    types: [opened, closed]
 
 jobs:
-  update-project:
+  manage-project:
     runs-on: ubuntu-latest
     steps:
-      - name: Add issue to project
-        uses: actions/add-to-project@v0.5.0
+      - name: Move issue to Todo when created
+        if: github.event_name == 'issues' && github.event.action == 'opened'
+        uses: actions/add-to-project@v0.6.1
         with:
           project-url: https://github.com/users/achaendus12-spec/projects/1
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          column-name: Todo
+
+      - name: Move issue to Done when closed
+        if: github.event_name == 'issues' && github.event.action == 'closed'
+        uses: actions/add-to-project@v0.6.1
+        with:
+          project-url: https://github.com/users/achaendus12-spec/projects/1
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          column-name: Done
+
+      - name: Move PR to In Progress when opened
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
+        uses: actions/add-to-project@v0.6.1
+        with:
+          project-url: https://github.com/users/achaendus12-spec/projects/1
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          column-name: In Progress
+
+      - name: Move PR to Done when merged
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        uses: actions/add-to-project@v0.6.1
+        with:
+          project-url: https://github.com/users/achaendus12-spec/projects/1
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          column-name: Done
