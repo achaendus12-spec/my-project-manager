@@ -1,0 +1,6 @@
+Title,Assignees,Status,Labels,Notes
+Setup project repository,,Todo,setup,Initialize GitHub repo with README
+Design database schema,,In Progress,database,Create ERD and tables
+Build authentication module,,In Progress,backend,Implement login and register
+Create project board,,Done,management,Setup GitHub Project Board
+Write documentation,,Todo,docs,Add project documentation in README
