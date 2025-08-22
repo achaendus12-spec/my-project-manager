@@ -1,54 +1,29 @@
 name: Project Board Automation
 
 on:
-  issues:
-    types: [opened, closed]
   pull_request:
-    types: [opened, closed]
+    types: [opened, reopened, closed]
 
 jobs:
-  # ========== Workflow lama (punyamu, tetap utuh) ==========
-  manage-project:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Move issue to Todo when created
-        if: github.event_name == 'issues' && github.event.action == 'opened'
-        uses: actions/add-to-project@v0.6.1
-        with:
-          project-url: https://github.com/users/achaendus12-spec/projects/1
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          column-name: Todo
-
-      - name: Move issue to Done when closed
-        if: github.event_name == 'issues' && github.event.action == 'closed'
-        uses: actions/add-to-project@v0.6.1
-        with:
-          project-url: https://github.com/users/achaendus12-spec/projects/1
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          column-name: Done
-
-      - name: Move PR to In Progress when opened
-        if: github.event_name == 'pull_request' && github.event.action == 'opened'
-        uses: actions/add-to-project@v0.6.1
-        with:
-          project-url: https://github.com/users/achaendus12-spec/projects/1
-          github-token: ${{ secrets.PAT }}
-          column-name: In Progress
-
-      - name: Move PR to Done when merged
-        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
-        uses: actions/add-to-project@v0.6.1
-        with:
-          project-url: https://github.com/users/achaendus12-spec/projects/1
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          column-name: Done
-
-  # ========== Tambahan baru (versi Project v2) ==========
   manage-project-v2:
     runs-on: ubuntu-latest
     steps:
-      - name: Add issue/PR to Project v2
+      # Step 1: Pindah PR ke "In Progress" saat dibuka
+      - name: Move PR to In Progress when opened
+        if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened')
         uses: actions/add-to-project@v0.5.0
         with:
           project-url: https://github.com/users/achaendus12-spec/projects/1
           github-token: ${{ secrets.PAT }}
+          status-field: Status
+          status-value: In Progress
+
+      # Step 2: Pindah PR ke "Done" saat di-merge
+      - name: Move PR to Done when merged
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: https://github.com/users/achaendus12-spec/projects/1
+          github-token: ${{ secrets.PAT }}
+          status-field: Status
+          status-value: Done
