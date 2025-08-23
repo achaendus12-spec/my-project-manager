@@ -4,10 +4,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-pat:
+  check-pat:
     runs-on: ubuntu-latest
     steps:
-      - name: Test PAT
-        run: echo "PAT is available and working ✅"
-        env:
-          PAT: ${{ secrets.PAT }}
+      - name: Test GitHub PAT Secret
+        run: |
+          if [ -z "${{ secrets.PAT }}" ]; then
+            echo "❌ PAT secret is missing"
+            exit 1
+          else
+            echo "✅ PAT secret is available"
+          fi
