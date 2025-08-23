@@ -1,0 +1,22 @@
+name: Test Supabase
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-supabase:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run Supabase auth test
+        run: |
+          curl -X POST "$SUPABASE_URL/auth/v1/token?grant_type=password" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"email":"'$TEST_EMAIL'","password":"'$TEST_PASSWORD'"}'

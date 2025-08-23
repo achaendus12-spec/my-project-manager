@@ -1,0 +1,29 @@
+name: Project Board Automation
+
+on:
+  pull_request:
+    types: [opened, reopened, closed]
+
+jobs:
+  manage-project-v2:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Pindah PR ke "In Progress" saat dibuka
+      - name: Move PR to In Progress when opened
+        if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened')
+        uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: https://github.com/users/achaendus12-spec/projects/1
+          github-token: ${{ secrets.PAT }}
+          status-field: Status
+          status-value: In Progress
+
+      # Step 2: Pindah PR ke "Done" saat di-merge
+      - name: Move PR to Done when merged
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: https://github.com/users/achaendus12-spec/projects/1
+          github-token: ${{ secrets.PAT }}
+          status-field: Status
+          status-value: Done

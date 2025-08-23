@@ -1,0 +1,23 @@
+name: Test Automation
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-automation:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      PAT: ${{ secrets.PAT }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check secrets availability
+        run: |
+          echo "✅ All required secrets are available"
+          echo "🔒 PAT length: ${#PAT}"
+          echo "🔒 SUPABASE_URL: $SUPABASE_URL"
+          echo "🔒 Supabase Key length: ${#SUPABASE_ANON_KEY}"

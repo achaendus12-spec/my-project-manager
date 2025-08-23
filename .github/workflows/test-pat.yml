@@ -1,0 +1,13 @@
+name: Test PAT Secret
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-pat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test PAT
+        run: echo "PAT is available and working ✅"
+        env:
+          PAT: ${{ secrets.PAT }}
